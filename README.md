@@ -1,4 +1,4 @@
-Simple "local" (cloud disabled) web socket server implementation for the sparkcoe (https://www.spark.io/) ported from https://github.com/brandenhall/Arduino-Websocket.git.
+Simple "local" (cloud disabled) websocket server implementation for the sparkcoe (https://www.spark.io/) ported from https://github.com/brandenhall/Arduino-Websocket.git.
 The server, by default handles up-to 4 simultaneous clients.
 I had to change the TCPServer (spark_wiring_tcpserver.cpp). For some reason the TCPServer had a references to a TCPClient, beside not making sense to me it was preventing me of having more than one client attached, hense the changes.
 NOTE, I have only tested this with local builds, so try it with sparkulator on your own risk :).
@@ -6,7 +6,7 @@ NOTE, I have only tested this with local builds, so try it with sparkulator on y
 I did not have time to create new make files, so for now, you have to copy files (backup original the files first).
 Copy files from src|inc|build to core-firmware/src|inc|build. My plan is to learn how to create a proper sparkcore lib from this...
 
-The applicaiton.cpp is a simplified version of the tinker firmware that I used for my testing and currently can handle: digitalread, digitalwrite, analogread and analogwrite. When I get a chance it will add something like Spark.publish... 
+The applicaiton.cpp is a simplified version of the tinker firmware that I used for my testing and currently can handle: digitalread, digitalwrite, analogread and analogwrite. When I get a chance I will add something like Spark.publish... 
 applicaiton.cpp requires Serial connection, the core will halt the execution in the setup (the RGB led will flash blue, green and pink) until the serial communication is established. 
 
 Here is how you can use the web-socket tinker firmware:
