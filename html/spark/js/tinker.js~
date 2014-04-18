@@ -1,0 +1,226 @@
+var rgbX = 175.6;
+var rgbY = 83.3;
+var analogX = 100;
+var analogXT =0;
+var digitalX = 250;
+var digitalXT = 265;
+var startY = 132;
+var pinDistance = 22;
+var varticalPinPos = [132, 154, 176, 198, 220, 241, 261, 283];
+var onColor = "#11A11F";
+var disconnectColor = "#F0981D";
+var connectedColor="#14BFCF";
+var connectingColor="#3914CF";
+var rgbColor=connectingColor;
+var errorColor = "#F000000";
+
+var connectedColor = "#2FD1D7";
+var connected = false;
+
+var rgbOnOff = true;
+
+var digitalPinStates = [false, false, false, false, false, false, false, false];
+var analogPinValues = [-1, -1, -1, -1, -1, -1, -1, -1];
+var inputText = "I";
+var outputText = "O";
+ if ( typeof String.prototype.startsWith != 'function') {
+      // see below for better implementation!
+      String.prototype.startsWith = function(str) {
+        return this.indexOf(str) == 0;
+      };
+    }
+    function connect() {
+      if ("WebSocket" in window) {
+        console.log("Connecting!");
+        // Let us open a web socket
+        ws = new WebSocket("ws://192.168.1.8:2525");
+        //var ws = new WebSocket("ws://192.168.1.8:2525");
+        ws.onopen = function() {
+          // Web Socket is connected, send data using send()
+          console.log("Connected");
+          beatColor = connectedColor;
+          gotBeatFromServer = true;
+          for ( pin = 0; pin < 8; pin++) {
+           var test = $('canvas').getLayer('D' + pin);
+            test.fillStyle = "#FFF";
+           $('canvas').drawLayer(test);
+          }
+          for ( pin = 0; pin < 8; pin++) {
+           ws.send("/digitalread?D" + pin);
+          }
+        };
+        ws.onmessage = function(evt) {
+          var received_msg = evt.data;
+console.log(received_msg);
+          if (received_msg == "HB") {
+            gotBeatFromServer = true;
+          } else if (received_msg.startsWith("digitalWrote") || received_msg.startsWith("Digital") ) {
+           
+            var what = received_msg.split(",")[1].trim();
+            var pin = what.charAt(0);
+	    updateDigialPin(pin,what.charAt(2) == "1" );
+          }
+        };
+        ws.onclose = function() {
+          // websocket is closed.
+	rgbColor=disconnectColor;
+          console.log("Disconnected.");
+        };
+      } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+      }
+      function WebSocketTest() {
+        ws.send("/pos");
+      }
+
+    }
+ function doDigitalPin(pin, on, input) {
+     
+      if (input) {
+        ws.send("/digitalread?D" + pin);
+      } else {
+        ws.send("/digitalwrite?D" + pin + "=" + ( on ? "HIGH" : "LOW"));
+      }
+    }
+function updateDigialPin(pin, value) {
+ digitalPinStates[pin] = value;
+ for (i = 0; i < digitalPinStates.length; i++) {
+  $('#core').getLayer('D' + pin).visible = digitalPinStates[i];
+ }
+ $('#core').drawLayers();
+}
+
+function updateAnalogPin(pin, value) {
+ digitalPinStates[pin] = value;
+ for (i = 0; i < analogPinValues.length; i++) {
+  $('#core').getLayer('A' + pin).visible = (analogPinValues[i] != -1);
+  if (analogPinValues[i] != -1) {
+   //NASSER draw text
+  }
+  $('#core').drawLayers();
+ }
+}
+
+function initPins() {
+ for (i = 0; i < 8; i++) {
+  $("#core").drawEllipse({
+   index: 1,
+   layer: true,
+   visible: false,
+   name: "A" + (7 - i),
+   groups: "[analogPins]",
+   fillStyle: onColor,
+   x: analogX,
+   y: varticalPinPos[i],
+   width: 15,
+   height: 15
+  });
+  $("#core").drawEllipse({
+   index: 1,
+   layer: true,
+   name: "D" + (7 - i),
+   visible: true,
+   groups: "[digitalPins]",
+   fillStyle: onColor,
+   x: digitalX,
+   y: varticalPinPos[i],
+   width: 15,
+   height: 15,
+ click: function(layer) {
+            var id = layer.name.charAt(1);
+            var state = !digitalPinStates[id];
+            digitalPinStates[id] = state;
+            doDigitalPin(id, state, false);
+          }
+
+  });
+ }
+}
+function initPinTexts() {
+ for (i = 0; i < 8; i++) {
+  $("#core").drawText({
+   index: 1,
+   layer: true,
+   visible: true,
+   fontSize: 10,
+   fontFamily: 'Verdana, sans-serif',
+   text: outputText+"/"+"12345.6789",
+   align: 'left',
+   respectAlign: true,
+   name: "AT" + (7 - i),
+   groups: "[analogPins]",
+   fillStyle: "black",
+   x: analogXT,
+   y: varticalPinPos[i]-55,
+	fromCenter: false,
+rotate: '45',
+click: function(layer) {
+      // Click a star to spin it
+      $(this).animateLayer(layer, {
+        rotate: '-=270',
+      });
+}
+  });
+
+  $("#core").drawText({
+   index: 1,
+   layer: true,
+   visible: true,
+   fontSize: '10',
+   fontFamily: 'Verdana, sans-serif',
+   text: outputText + ":" + "1",
+   name: "DT" + (7 - i),
+   groups: "[analogPins]",
+   fillStyle: "black",
+   x: digitalXT,
+   y: varticalPinPos[i]-10,
+	fromCenter: false,
+rotate: '-45',
+click: function(layer) {
+      // Click a star to spin it
+      $(this).animateLayer(layer, {
+       // rotate: '-=45',
+      });
+    }
+  });
+
+ }
+}
+function initRGB() {
+ $("#core").drawEllipse({
+  index: 1,
+  layer: true,
+  name: "RGB",
+  visible: false,
+  fillStyle: disconnectColor,
+  x: rgbX,
+  y: rgbY,
+  width: 19,
+  height: 19
+ });
+}
+function init() {
+ initPins();
+ initPinTexts();
+ initRGB();
+$("#core").jCanvas.eventHooks.add = function() {
+	console.log("cool");
+};
+ setInterval(function () { beat(); }, 1000);
+ connect();
+}
+function beat() {
+
+ $('#core').getLayer('RGB').fillStyle = rgbColor;
+
+ $('#core').getLayer('RGB').visible = rgbOnOff;
+ $('#core').drawLayer('RGB');
+ rgbOnOff = !rgbOnOff;
+ $('#core').drawLayers();
+}
+function digitalOnOff(pin, on) {
+ $('#core').getLayer('D' + pin).visible = on;
+ //$('#core').drawLayer('D' + pin);
+ $('#core').drawLayers();
+}
