@@ -1,23 +1,4 @@
-/*******************************************************************************
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, #EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF #MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO #EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR #OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, #ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER #DEALINGS IN
-* THE SOFTWARE.
-* Copyright (c) 2014 NaAl (h20@alocreative.com)
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in
-* all copies or substantial portions of the Software.
-*/
+// ThisLegs #include statement was automatically added by the Spark IDE.
 #include "application.h"
 #include "Bed.h"
 #include "ADXL335.h"
@@ -32,29 +13,33 @@ TCPServer server = TCPServer(2525);
 
 //WebSocketServer ws;
 SparkWebSocketServer mine(server);
+bool digitalStates[]={false,false,false,false,false,false,false,false};
 
 void dfu();
 void tinkerDigitalRead(const String &pin, String &result);
 void tinkerDigitalWrite(const String &command, String &result);
 void tinkerAnalogRead(const String &pin, String &result);
 void tinkerAnalogWrite(String &command, String &result);
-static const uint8_t D_PINS[]= {D0,D1,D2,D3,D4,D5,D6,D7};
+
+void tinkerDigitalReadAll(String &result) {
+  result+="DigitalAll, ";
+  for(int i=0;i<8;i++) {
+    result+="D";
+    result+=i;
+    result+=":";
+    result+=(digitalStates[i]?1:0);
+    if(i+1<8) {
+      result+=",";
+    }
+  }
+}
 
 void setup() {
-  pinMode(A0, INPUT);
-  pinMode(A1, INPUT);
-
-  pinMode(A2, INPUT);
-  pinMode(A3, INPUT);
-
-  pinMode(A4, INPUT);
-  pinMode(A5, INPUT);
-
-  pinMode(A6, INPUT);
-  pinMode(A7, INPUT);
-
+  uint8_t D_PINS[]= {D0,D1,D2,D3,D4,D5,D6,D7};
+  uint8_t A_PINS[]= {A0,A1,A2,A3,A4,A5,A6,A7};
   for(uint8_t i=0;i<8;i++) {
-    pinMode(D_PINS[i], OUTPUT);
+    pinMode(D_PINS[i], INPUT);
+    pinMode(A_PINS[i], INPUT);
   }
 
   CallBack cb=&handle;
@@ -107,6 +92,10 @@ void handle(String &cmd, String &result){
     dfu();
     return;
   }
+  if(cmd == "/digitalreadall") {
+        tinkerDigitalReadAll(result);
+        return;
+      }
   int index=cmd.indexOf('?');
   if(index==-1) {
     result = "WHAT";
@@ -221,6 +210,7 @@ void tinkerDigitalWrite(const String &command, String &result)
     result+=pinNumber;
     result += ":";
     result+=value;
+    digitalStates[pinNumber]=value==1;
     return;
   } else if(command.startsWith("A")){
     pinNumber = pinNumber + 10;
@@ -264,7 +254,7 @@ void tinkerAnalogRead(const String &pin, String &result)
     pinNumber = pinNumber + 10;
     pinMode(pinNumber, INPUT);
     result="Analog, ";
-    result+=pinNumber;
+    result+=(pinNumber-10);
     result+=":";
     result+=analogRead(pinNumber);
     return;
