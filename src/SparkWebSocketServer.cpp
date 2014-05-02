@@ -38,10 +38,9 @@
 * - OLD -
 * Currently based off of "The Web Socket protocol" draft (v 75):
 * http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-75
-/*******************************************************************************
+*******************************************************************************/
 
 #include "SparkWebSocketServer.h"
-#include "global.h"
 
 #ifdef SUPPORT_HIXIE_76
 #include "MD5.c"
