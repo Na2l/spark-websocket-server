@@ -27,7 +27,7 @@
 #define __SPARK_WIRING_TCPSERVER_H
 
 #include "spark_wiring.h"
-
+#include "spark_wiring_tcpclient.h"
 class TCPClient;
 
 class TCPServer : public Print {
