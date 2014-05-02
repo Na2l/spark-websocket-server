@@ -1,6 +1,8 @@
 Simple "local" (cloud disabled) websocket server implementation for the sparkcoe (https://www.spark.io/) ported from https://github.com/brandenhall/Arduino-Websocket.git.
 The server, by default handles up-to 4 simultaneous clients.
-I had to change the TCPServer (spark_wiring_tcpserver.cpp). For some reason the TCPServer had a references to a TCPClient, beside not making sense to me it was preventing me of having more than one client attached, hence the changes.
+Watch the demo:
+https://www.youtube.com/watch?v=B886_m16s6s&feature=youtu.be
+On the right, html5 +WebSocket that is connected to a sparkcore, on the left you see the serial output from the core. You can change the state of the digital pins by clicking on the pins, clicking on the analog pins will read the analoge values. ﻿
 NOTE, I have only tested this with local builds, so try it with sparkulator on your own risk :).
 
 I did not have time to create new make files, so for now, you have to copy files (backup original the files first).
