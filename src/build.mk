@@ -14,10 +14,8 @@ CSRC +=
 
 # C++ source files included in this build.
 CPPSRC += $(TARGET_SRC_PATH)/application.cpp
-CPPSRC += $(TARGET_SRC_PATH)/ADXL335.cpp
 CPPSRC += $(TARGET_SRC_PATH)/SparkWebSocketServer.cpp
 CPPSRC += $(TARGET_SRC_PATH)/Base64.cpp
-CPPSRC += $(TARGET_SRC_PATH)/Bed.cpp
 CPPSRC += $(TARGET_SRC_PATH)/main.cpp
 CPPSRC += $(TARGET_SRC_PATH)/newlib_stubs.cpp
 CPPSRC += $(TARGET_SRC_PATH)/spark_utilities.cpp
