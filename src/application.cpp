@@ -1,9 +1,6 @@
 // ThisLegs #include statement was automatically added by the Spark IDE.
 #include "application.h"
-#include "Bed.h"
-#include "ADXL335.h"
 #include <math.h>
-#include "WebSocketServer.h"
 #include "SparkWebSocketServer.h"
 #include "spark_disable_cloud.h"
 

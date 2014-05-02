@@ -27,9 +27,7 @@
 
 #include "spark_wiring_tcpclient.h"
 
-#include "spark_wiring_usbserial.h"
 
-uint16_t TCPClient::_srcport = 1024;
 
 static bool inline isOpen(long sd)
 {
@@ -40,6 +38,7 @@ TCPClient::TCPClient() : _sock(MAX_SOCK_NUM)
 {
   resetIp();
   flush();
+
 }
 
 TCPClient::TCPClient(uint8_t sock) : _sock(sock) 
@@ -59,14 +58,13 @@ int TCPClient::connect(const char* host, uint16_t port)
     if(gethostbyname((char*)host, strlen(host), &ip_addr) > 0)
     {
       IPAddress remote_addr(BYTE_N(ip_addr, 3), BYTE_N(ip_addr, 2), BYTE_N(ip_addr, 1), BYTE_N(ip_addr, 0));
-
       return connect(remote_addr, port);
     }
   }
   return rv;
 }
 
-int TCPClient::connect(IPAddress &anIp, uint16_t port)
+int TCPClient::connect(IPAddress ip, uint16_t port) 
 {
   int connected = 0;
   if(isWanReady())
@@ -84,10 +82,10 @@ int TCPClient::connect(IPAddress &anIp, uint16_t port)
       tSocketAddr.sa_data[0] = (port & 0xFF00) >> 8;
       tSocketAddr.sa_data[1] = (port & 0x00FF);
 
-      tSocketAddr.sa_data[2] = anIp._address[0];
-      tSocketAddr.sa_data[3] = anIp._address[1];
-      tSocketAddr.sa_data[4] = anIp._address[2];
-      tSocketAddr.sa_data[5] = anIp._address[3];
+      tSocketAddr.sa_data[2] = ip._address[0];
+      tSocketAddr.sa_data[3] = ip._address[1];
+      tSocketAddr.sa_data[4] = ip._address[2];
+      tSocketAddr.sa_data[5] = ip._address[3];
 
 
       uint32_t ot = SPARK_WLAN_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
@@ -101,12 +99,6 @@ int TCPClient::connect(IPAddress &anIp, uint16_t port)
         stop();
       }
     }
-  }
-  if(connected) {
-    myIp[0]=anIp._address[0];
-    myIp[1]=anIp._address[1];
-    myIp[2]=anIp._address[2];
-    myIp[3]=anIp._address[3];
   }
   return connected;
 }
@@ -130,24 +122,7 @@ int TCPClient::bufferCount()
 {
   return _total - _offset;
 }
-void TCPClient::setIp(unsigned char a, unsigned char b, unsigned char c, unsigned char d, unsigned char e) {
-  myIp[0]=a;
-  myIp[1]=b;
-  myIp[2]=c;
-  myIp[3]=d;
-  myIp[4]=e;
-}
-void TCPClient::getIP(String &val) {
-  val+=myIp[0];
-  val+=".";
-  val+=myIp[1];
-  val+=".";
-  val+=myIp[2];
-  val+=".";
-  val+=myIp[3];
-  val+=":";
-  val+=myIp[4];
-}
+
 int TCPClient::available() 
 {
   int avail = 0;
@@ -247,22 +222,22 @@ bool TCPClient::connected()
   }
   return rv;
 }
-bool TCPClient::equals(TCPClient &client) {
-  if(&client==NULL) {
-    return false;
-  }
-  return myIp[0] == client.myIp[0] &&
-      myIp[1] == client.myIp[1] &&
-      myIp[2] == client.myIp[2] &&
-      myIp[3] == client.myIp[3];
-}
+
 uint8_t TCPClient::status()
 {
   return (isOpen(_sock) && isWanReady() && (SOCKET_STATUS_ACTIVE == get_socket_active_status(_sock)) ? 1 : 0);
 
 }
+bool TCPClient::equals(TCPClient &tcpClient) {
 
+  return ip[0]==tcpClient.ip[0] &&
+      ip[1]==tcpClient.ip[1] &&
+      ip[2]==tcpClient.ip[2] &&
+      ip[3]==tcpClient.ip[3] &&
+      ip[4]==tcpClient.ip[4];
+
+}
 TCPClient::operator bool()
-        {
+    {
   return (status() ? 1 : 0);
-        }
+    }

@@ -7,7 +7,7 @@
  * @brief   
  ******************************************************************************
   Copyright (c) 2013 Spark Labs, Inc.  All rights reserved.
-  Copyright (c) 2014 NaAl (h20@alocreative.com).  All rights reserved.
+
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation, either
@@ -23,11 +23,9 @@
  ******************************************************************************
  */
 
-#include "spark_wiring_tcpclient.h"
+
 #include "spark_wiring_tcpserver.h"
-#ifdef DEBUG_WS
-#include "spark_wiring_usbserial.h"
-#endif
+#include "application.h"
 TCPServer::TCPServer(uint16_t port) : _port(port), _sock(MAX_SOCK_NUM)
 {
 
@@ -76,7 +74,9 @@ void TCPServer::begin()
 
   _sock = sock;
 }
-TCPClient *TCPServer::available() {
+
+TCPClient *TCPServer::available()
+{
   if(_sock == MAX_SOCK_NUM)
   {
     begin();
@@ -85,12 +85,8 @@ TCPClient *TCPServer::available() {
   if((WIFI_ON != WiFi.status()) || (_sock == MAX_SOCK_NUM))
   {
     _sock = MAX_SOCK_NUM;
-#ifdef DEBUG_WS
-    Serial.println("TCPServer::available(), WIFI_ON != WiFi.status()) || (_sock == MAX_SOCK_NUM)");
-#endif
-    //    _client = TCPClient(MAX_SOCK_NUM);
-    //    return _client;
-    return NULL;
+    //		_client = TCPClient(MAX_SOCK_NUM);
+    //		return _client;
   }
 
   sockaddr tClientAddr;
@@ -98,20 +94,36 @@ TCPClient *TCPServer::available() {
 
   int sock = accept(_sock, (sockaddr*)&tClientAddr, &tAddrLen);
 
-
   if (sock < 0)
   {
-    return NULL;
+    //_client = TCPClient(MAX_SOCK_NUM);
   }
   else
   {
-    TCPClient *tmp=new TCPClient(sock);
-
-    if(tmp->connected()) {
-      tmp->setIp(tClientAddr.sa_data[5], tClientAddr.sa_data[4], tClientAddr.sa_data[3], tClientAddr.sa_data[2], tClientAddr.sa_data[1]);
+    TCPClient *client = new TCPClient(sock);
+    if(client->connected()) {
+#ifdef DEBUG_WS
+      Serial.print("client: ");
+      Serial.print(tClientAddr.sa_data[5]);
+      Serial.print(".");
+      Serial.print(tClientAddr.sa_data[4]);
+      Serial.print(".");
+      Serial.print(tClientAddr.sa_data[3]);
+      Serial.print(".");
+      Serial.print(tClientAddr.sa_data[2]);
+      Serial.print(":");
+      Serial.print(tClientAddr.sa_data[1]);
+      Serial.print(",");
+            Serial.print(tClientAddr.sa_data[0]);
+      Serial.println(" Connected");
+#endif
+      IPAddress test((uint8_t)tClientAddr.sa_data[5], (uint8_t)tClientAddr.sa_data[4], (uint8_t)tClientAddr.sa_data[3], (uint8_t)tClientAddr.sa_data[2]);
+      client->setIp(test, (uint8_t)tClientAddr.sa_data[1]);
+      return client;
     }
-      return tmp;
   }
+
+  return NULL;
 }
 
 size_t TCPServer::write(uint8_t b) 
@@ -121,6 +133,6 @@ size_t TCPServer::write(uint8_t b)
 
 size_t TCPServer::write(const uint8_t *buffer, size_t size) 
 {
-
   return -1;
+  //	return _client.write(buffer, size);
 }
