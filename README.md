@@ -16,12 +16,12 @@ Copy files from src|inc|build to core-firmware/src|inc|build. My plan is to lear
 The applicaiton.cpp is a simplified version of the tinker firmware that I used for my testing and currently can handle: digitalread, digitalwrite, analogread and analogwrite. When I get a chance I will add something like Spark.publish... 
 applicaiton.cpp requires Serial connection, the core will halt the execution in the setup (the RGB led will flash blue, green and pink) until the serial communication is established. 
 
-example syntax to how communicate withe tinker firmware
+example syntax to how communicate with tinker firmware
 
 /digitalwrite?D3=HIGH
 /digitalread?D3
 
-If you develop on Linux if you have nodejs installed read on.
+If you develop on Linux and if you have nodejs installed read on.
 After flashing the core for the first time with the compiled files, you can use "doit" in the build folder, "doit" will put the core in the dfu mode, compile, and flash the core again.
 
 tinker.js in the example folder can be used for demo and or testing, currently it has loop that will turn on/off the first four digital outputs on the core.
