@@ -10,8 +10,7 @@ In the demo below, On the right, html5 +WebSocket that is connected to a sparkco
 
 NOTE, I have only tested this with local builds, so try it with sparkulator on your own risk :).
 
-I did not have time to create new make files, so for now, you have to copy files (backup original the files first).
-Copy files from src|inc|build to core-firmware/src|inc|build. My plan is to learn how to create a proper sparkcore lib from this...
+To build, simply run make in core-firmware/build. 
 
 The applicaiton.cpp is a simplified version of the tinker firmware that I used for my testing and currently can handle: digitalread, digitalwrite, analogread and analogwrite. When I get a chance I will add something like Spark.publish... 
 applicaiton.cpp requires Serial connection, the core will halt the execution in the setup (the RGB led will flash blue, green and pink) until the serial communication is established. 
@@ -22,7 +21,7 @@ example syntax to how communicate with tinker firmware
 /digitalread?D3
 
 If you develop on Linux and if you have nodejs installed read on.
-After flashing the core for the first time with the compiled files, you can use "doit" in the build folder, "doit" will put the core in the dfu mode, compile, and flash the core again.
+After flashing the core for the first time with, you can use "doit" in the core-firmware/build folder, "doit" will put the core in the dfu mode, compile, and flash the core again.
 
 tinker.js in the example folder can be used for demo and or testing, currently it has loop that will turn on/off the first four digital outputs on the core.
 Note you have to change the <IP>:<PORT> in the tinker.js
